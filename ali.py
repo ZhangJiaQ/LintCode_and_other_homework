@@ -1,5 +1,6 @@
 import time
 import requests
+import re
 
 from selenium import webdriver
 from fake_useragent import UserAgent
@@ -21,19 +22,24 @@ time.sleep(5)
 #利用selenium的find_element方法选择帐号密码然后进行登录
 element=WebDriverWait(driver,60).until(lambda driver :driver.find_element_by_xpath("//*[@id='J_Quick2Static']"))
 element.click()
-driver.find_element_by_name("TPL_username").send_keys('zmq2007zz')#3382315515@qq.com
+driver.find_element_by_name("TPL_username").send_keys('3382315515@qq.com')#3382315515@qq.com
 driver.find_element_by_name("TPL_password").clear()
-driver.find_element_by_name("TPL_password").send_keys('2zhlmcl,')#zmq2006zz
+driver.find_element_by_name("TPL_password").send_keys('zmq2006zz')#zmq2006zz
 driver.find_element_by_xpath("//*[@id='J_SubmitStatic']").click()
 time.sleep(30)
 
 # 跳转到化工商户页面的url
 driver.get(url)
 # 防爬虫的UserAgent处理
+
 cookie = [item["name"] + "=" + item["value"] for item in driver.get_cookies()]
 ua=UserAgent()
 cookiestr = ';'.join(item for item in cookie)
-s = requests.Session()
+cookies={}#初始化cookies字典变量
+for line in cookiestr.split(';'):   #按照字符：进行划分读取
+    #其设置为1就会把字符串拆分成2份
+    name,value=line.strip().split('=',1)
+    cookies[name]=value
 
 for page in range(1, 100):
     #
@@ -43,10 +49,11 @@ for page in range(1, 100):
         contact_url = title[i].get_attribute("href") + 'page/contactinfo.htm'
         #print(contact_url)
         headers = {'User-Agent': ua.random, 'Accept': '*/*', 'Referer': 'http://www.google.com'}
-        req1 = s.get(url, headers = headers, cookies = cookiestr, verify=False)
-        html=req1.content
+        r = requests.get(contact_url, headers=headers, cookies=cookies)
+        contact_content = r.text
 
-    #
+
+
     next_url = "https://s.1688.com/company/company_search.htm?sortType=pop&pageSize=30&keywords=%BE%C6&offset=3&beginPage={0}".format(i)
     driver.get(next_url)
 
