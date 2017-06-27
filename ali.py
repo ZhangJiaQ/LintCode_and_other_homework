@@ -33,6 +33,7 @@ driver.get(url)
 cookie = [item["name"] + "=" + item["value"] for item in driver.get_cookies()]
 ua=UserAgent()
 cookiestr = ';'.join(item for item in cookie)
+s = requests.Session()
 
 for page in range(1, 100):
     #
@@ -42,6 +43,8 @@ for page in range(1, 100):
         contact_url = title[i].get_attribute("href") + 'page/contactinfo.htm'
         #print(contact_url)
         headers = {'User-Agent': ua.random, 'Accept': '*/*', 'Referer': 'http://www.google.com'}
+        req1 = s.get(url, headers = headers, cookies = cookiestr, verify=False)
+        html=req1.content
 
     #
     next_url = "https://s.1688.com/company/company_search.htm?sortType=pop&pageSize=30&keywords=%BE%C6&offset=3&beginPage={0}".format(i)
