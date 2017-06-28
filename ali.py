@@ -61,6 +61,30 @@ for page in range(1, 100):
         headers = {'User-Agent': ua.random, 'Accept': '*/*', 'Referer': 'http://www.google.com'}
         r = requests.get(contact_url, headers=headers, cookies=cookies)
         contact_content = r.text
+        soup = BeautifulSoup(r.text, "html.parser")
+
+        phone_html = soup.find(class_='m-mobilephone')
+        phone_num_match = re.match(r'\D*(\d+).*', str(phone_html), re.DOTALL)
+        if phone_num_match:
+            phone_num = int(phone_num_match.group(1))
+        else:
+            phone_num = 0
+
+        name_html = soup.find(class_='contact-info').h4
+        name_content_match = re.match(r'.*<h4>(.*)</h4>.*', str(name_html), re.DOTALL)
+        if name_content_match:
+            name_content = name_content_match.group(1)
+        else:
+            name_content = ''
+
+        address_html = soup.find(class_='address')
+        address_content_match = re.match(r'.*s">(.*?)</dd>*', str(address_html), re.DOTALL)
+        if address_content_match:
+            address_content = address_content_match.group(1)
+        else:
+            address_content = ''
+
+        print(address_content, '\n', name_content, '\n', phone_num)
         pass
 
     #进行下一页的爬取
