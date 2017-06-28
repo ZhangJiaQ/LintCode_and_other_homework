@@ -60,36 +60,44 @@ for page in range(1, 100):
         #print(contact_url)
         headers = {'User-Agent': ua.random, 'Accept': '*/*', 'Referer': 'http://www.google.com'}
         r = requests.get(contact_url, headers=headers, cookies=cookies)
-        contact_content = r.text
         soup = BeautifulSoup(r.text, "html.parser")
 
         phone_html = soup.find(class_='m-mobilephone')
         phone_num_match = re.match(r'\D*(\d+).*', str(phone_html), re.DOTALL)
         if phone_num_match:
-            phone_num = int(phone_num_match.group(1))
+            phone_num = int(phone_num_match.group(1).replace(" ", ""))
         else:
             phone_num = 0
 
-        name_html = soup.find(class_='contact-info').h4
+        name_html = soup.find(class_='contact-info')
         name_content_match = re.match(r'.*<h4>(.*)</h4>.*', str(name_html), re.DOTALL)
         if name_content_match:
-            name_content = name_content_match.group(1)
+            name_content = name_content_match.group(1).replace(" ", "")
         else:
             name_content = ''
 
         address_html = soup.find(class_='address')
         address_content_match = re.match(r'.*s">(.*?)</dd>*', str(address_html), re.DOTALL)
         if address_content_match:
-            address_content = address_content_match.group(1)
+            address_content = address_content_match.group(1).replace(" ", "")
         else:
             address_content = ''
 
-        print(address_content, '\n', name_content, '\n', phone_num)
-        pass
+        print(address_content, name_content, phone_num)
+
+        company_data = {
+            'company_url':contact_url,
+            'company_name':name_content,
+            'company_address':address_content,
+            'company_phonenum':phone_num,
+        }
+        with open('data.html', 'w') as f:
+            f.write(str(company_data))
+
+        time.sleep(random.uniform(1,3))
 
     #进行下一页的爬取
     next_url = "https://s.1688.com/company/company_search.htm?sortType=pop&pageSize=30&keywords=%BE%C6&offset=3&beginPage={0}".format(i)
     driver.get(next_url)
-
 
 
