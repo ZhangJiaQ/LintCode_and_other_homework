@@ -90,7 +90,6 @@ import requests
 # print (cookies)
 
 
-
 import re
 from bs4 import BeautifulSoup
 member_name_pattern = re.compile('<a.*?class="membername".*?>(.*?)</a>', re.S)
@@ -99,6 +98,26 @@ pattern = re.compile('<div class="contcat-desc".*?>(.*?)</div>', re.S)
 
 with open('/home/judge/Desktop/4567.html','r') as f:
     soup = BeautifulSoup(f.read(),"html.parser")
-    print (soup.)
-    #print (soup.select('.contact-info\n'))
-    #print (soup.select('.address'))
+
+    phone_html = soup.find(class_='m-mobilephone')
+    phone_num_match = re.match(r'\D*(\d+).*',str(phone_html),re.DOTALL)
+    if phone_num_match:
+        phone_num = int(phone_num_match.group(1).replace(" ",""))
+    else:
+        phone_num = 0
+
+    name_html = soup.find(class_='contact-info').h4
+    name_content_match = re.match(r'.*<h4>(.*)</h4>.*',str(name_html),re.DOTALL)
+    if name_content_match:
+        name_content = name_content_match.group(1).replace(" ","")
+    else:
+        name_content = ''
+
+    address_html = soup.find(class_='address')
+    address_content_match = re.match(r'.*s">(.*?)</dd>*', str(address_html), re.DOTALL)
+    if address_content_match:
+        address_content = address_content_match.group(1).replace(" ","")
+    else:
+        address_content = ''
+
+    print(address_content,name_content,phone_num)
