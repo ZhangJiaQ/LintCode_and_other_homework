@@ -25,4 +25,4 @@ class Solution:
         if target == nums[high]:
             return high
 
-        return -1
+        return False
